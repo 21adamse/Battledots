@@ -1,0 +1,516 @@
+import turtle, random, time
+letters=["A","B","C","D","E","F","G","H","I","J"]
+numbers=[0,1,2,3,4,5,6,7,8,9]
+attackcoord=[]
+lasthit=[]
+lastindex=0
+lastplace=""
+part1=0
+part2=0
+hitcount=0
+psinkcount=0
+esinkcount=0
+lastnum=0
+attackspree=False
+writer=turtle.Turtle()
+writer.color("red")
+writer.hideturtle()
+boardmake=turtle.Turtle()
+boardmake.color("grey")
+boardmake.fillcolor("grey")
+boardmake.width(15)
+boardmake.speed(0)
+boardmake.hideturtle()
+shipmake=turtle.Turtle()
+shipmake.speed(0)
+shipmake.hideturtle()
+bg=turtle.Screen()
+bg.bgcolor("black")
+boarda=[]
+boardb=[]
+for x in range(100):
+  boarda.append([])
+  boardb.append([])
+enemydots=[
+    [
+      [],
+      [],
+      [],
+      [],
+      []
+      ],
+    [
+      [],
+      [],
+      [],
+      [],
+      ],
+    [
+      [],
+      [],
+      [],
+      ],
+    [
+      [],
+      [],
+      [],
+      ],
+    [
+      [],
+      []
+      ]
+    ]
+playdots=[
+    [
+      [],
+      [],
+      [],
+      [],
+      []
+      ],
+    [
+      [],
+      [],
+      [],
+      [],
+      ],
+    [
+      [],
+      [],
+      [],
+      ],
+    [
+      [],
+      [],
+      [],
+      ],
+    [
+      [],
+      []
+      ]
+    ]
+playplaces=[]
+for i in range(10):
+  for x in range(10):
+    playplaces.append(letters[i]+str(x))
+enemyattackdots=[]
+def turmove(maker,x,y):
+  maker.up()
+  maker.goto(x,y)
+  maker.down()
+def turmake(maker,turn,length):
+  maker.right(turn)
+  maker.forward(length)
+def clearscreen():
+  writer.clear()
+  boardmake.clear()
+  shipmake.clear()
+def battleground():
+  global letters
+  turmove(boardmake,-180,180)
+  boardmake.color("grey")
+  boardmake.width(12)
+  boardmake.begin_fill()
+  turmake(boardmake,0,175)
+  for x in range(3):
+    turmake(boardmake,90,175)
+  boardmake.end_fill()
+  turmove(boardmake,0,0)
+  boardmake.begin_fill()
+  for x in range(4):
+    turmake(boardmake,90,175)
+  boardmake.end_fill()
+  boardmake.color("black")
+  x=-172
+  y=177
+  d=0
+  for letter in letters:
+    turmove(boardmake,x,y)
+    boardmake.write(letter,font=("calibri",8))
+    x+=17
+  x=-183
+  y=167
+  for i in range(10):
+    turmove(boardmake,x,y)
+    boardmake.write(i,font=("calibri",8))
+    y-=17
+  x=8
+  y=-3
+  d=0
+  for letter in letters:
+    turmove(boardmake,x,y)
+    boardmake.write(letter,font=("calibri",8))
+    x+=17
+  x=-3
+  y=-13
+  for i in range(10):
+    turmove(boardmake,x,y)
+    boardmake.write(i,font=("calibri",8))
+    y-=17
+  x=-170
+  y=170
+  d=0
+  for i in range(10):
+    x=-170
+    for i in range(10):
+      turmove(boardmake,x,y)
+      boardmake.dot(10,"black")
+      boarda[d].append(x)
+      boarda[d].append(y)
+      d+=1
+      x=x+17
+    y-=17
+  y=-10
+  d=0
+  for x in range(10):
+    x=10
+    for i in range(10):
+      turmove(boardmake,x,y)
+      boardmake.dot(10,"black")
+      boardb[d].append(x)
+      boardb[d].append(y)
+      d+=1
+      x+=17
+    y-=17
+def playerships():
+  ships=[5,4,3,3,2]
+  s=0
+  for ship in ships:
+    xy=random.choice(boarda)
+    orientation=random.randint(0,1)
+    x=xy[0]
+    y=xy[1]
+    shipon=False
+    while shipon==False:
+      if orientation == 0:
+        if y+(17*ship-1) < 171:
+          d=0
+          shipon=True
+          for i in range(ship):
+            turmove(boardmake,x,y)
+            boardmake.dot(10,"green")
+            playdots[s][d].append(x)
+            playdots[s][d].append(y)
+            y+=17
+            d+=1
+        else:
+          xy=random.choice(boarda)
+          x=xy[0]
+          y=xy[1]
+      elif orientation == 1:
+        if x+(17*ship-1) < -16:
+          shipon=True
+          d=0
+          for i in range(ship):
+            turmove(boardmake,x,y)
+            boardmake.dot(10,"green")
+            playdots[s][d].append(x)
+            playdots[s][d].append(y)
+            x+=17
+            d+=1
+        else:
+          xy=random.choice(boarda)
+          x=xy[0]
+          y=xy[1]
+    s+=1
+def enemyships():
+  ships=[5,4,3,3,2]
+  s=0
+  for ship in ships:
+    xy=random.choice(boardb)
+    orientation=random.randint(0,1)
+    x=xy[0]
+    y=xy[1]
+    shipon=False
+    while shipon==False:
+      if orientation == 0:
+        if y+(17*ship-1) < 16:
+          d=0
+          shipon=True
+          for i in range(ship):
+            turmove(boardmake,x,y)
+            boardmake.dot(10,"green")
+            enemydots[s][d].append(x)
+            enemydots[s][d].append(y)
+            y+=17
+            d+=1
+        else:
+          xy=random.choice(boardb)
+          x=xy[0]
+          y=xy[1]
+      elif orientation == 1:
+        if x+(17*ship-1) < 171:
+          d=0
+          shipon=True
+          for i in range(ship):
+            turmove(boardmake,x,y)
+            boardmake.dot(10,"green")
+            enemydots[s][d].append(x)
+            enemydots[s][d].append(y)
+            x+=17
+            d+=1
+        else:
+          xy=random.choice(boardb)
+          x=xy[0]
+          y=xy[1]
+    s+=1
+def playsquarefind(place):
+  global letters,numbers,attackcoord
+  attackcoord=[]
+  for letter in letters:
+    if place[0]==letter:
+      xval=10+(17*letters.index(letter))
+      attackcoord.append(xval)
+  for number in numbers:
+    if int(place[1])==number:
+      yval=-10-(17*number)
+      attackcoord.append(yval)
+  return attackcoord
+def enemysquarefind(place):
+  global letters,numbers,attackcoord
+  attackcoord=[]
+  for letter in letters:
+    if place[0]==letter:
+      xval=-170+(17*letters.index(letter))
+      attackcoord.append(xval)
+  for number in numbers:
+    if int(place[1])==number:
+      yval=170-(17*number)
+      attackcoord.append(yval)
+  return attackcoord
+def playerattack():
+  global letters,numbers,enemydots
+  print("Your turn")
+  time.sleep(1)
+  repeat=True
+  while repeat == True:
+    place=input("Enter the place you want to attack")
+    if place not in playplaces:
+      print("Invalid input")
+    else:
+      repeat = False
+  playhit=False
+  print("You attack {}".format(place))
+  playplaces.remove(place)
+  time.sleep(1)
+  attackplace=playsquarefind(place)
+  turmove(shipmake,attackplace[0],attackplace[1])
+  playhit=False
+  for enemyship in enemydots:
+    if attackplace in enemyship:
+      shipmake.dot(10,"red")
+      print("It hit!")
+      enemyship.remove(attackplace)
+      playhit=True
+  if playhit==False:
+    shipmake.dot(10,"white")
+    print("It missed!")
+  return playhit
+def enemyattack():
+  global letters,numbers,playdots,lastplace,lastindex
+  global part1,part2,attackspree,enemyattackdots,lastnum
+  print("Enemy's turn")
+  time.sleep(1)
+  repeat = True
+  while repeat == True:
+    if attackspree==False:
+      part1=random.choice(letters)
+      part2=random.choice(numbers)
+    elif attackspree==True:
+      num=random.randint(0,3)
+      if num==0 and lastindex>0:
+        part1=letters[lastindex-1]
+        part2=lastplace[1]
+      elif num==1 and lastindex<9:
+        part1=letters[lastindex+1]
+        part2=lastplace[1]
+      elif num==2 and int(part2)>0:
+        part1=lastplace[0]
+        part2=int(part2)
+        part2=part2-1
+      elif num==3 and int(part2)<9:
+        part1=lastplace[0]
+        part2=int(part2)
+        part2=part2+1
+    place=part1+str(part2)
+    if place not in enemyattackdots:
+      enemyattackdots.append(place)
+      print("The enemy attacks {}".format(place))
+      repeat = False
+  time.sleep(1)
+  attackplace=enemysquarefind(place)
+  turmove(shipmake,attackplace[0],attackplace[1])
+  enemyhit=False
+  for x in range(len(playdots)):
+    if attackplace in playdots[x]:
+      shipmake.dot(10,"red")
+      print("It hit!")
+      playdots[x].remove(attackplace)
+      enemyhit=True
+      lastplace=place
+      lastindex=letters.index(part1)
+      attackspree=True
+  if enemyhit==False:
+    shipmake.dot(10,"white")
+    print("It missed!")
+def playrobot():
+  global attackspree
+  battleground()
+  playerships()
+  enemyships()
+  global psinkcount, esinkcount
+  while psinkcount != 5 and esinkcount != 5:
+    playsunkship=True
+    while playsunkship == True:
+      tsinkcount=psinkcount
+      playerattack()
+      for ship in enemydots:
+        if len(ship) != 0:
+          playsunkship=False
+        else:
+          time.sleep(1)
+          print("You sunk it's battleship")
+          enemydots.remove(ship)
+          psinkcount+=1
+      if tsinkcount<psinkcount and psinkcount !=5:
+        playsunkship=True
+      if len(enemydots) == 0:
+        playsunkship = False
+      time.sleep(2)
+    enemysunkship=True
+    if psinkcount != 5:
+      tsinkcount=-1
+      while tsinkcount<esinkcount:
+        tsinkcount=esinkcount
+        enemyattack()
+        for ship in playdots:
+          if ship == []:
+            time.sleep(1)
+            print("Your battleship was sunk")
+            playdots.remove(ship)
+            attackspree=False
+            esinkcount+=1
+            enemysunkship=False
+        if tsinkcount<esinkcount and esinkcount !=5:
+          enemysunkship=True
+        if len(playdots) == 0:
+          enemysunkship=False
+        time.sleep(2)
+  clearscreen()
+  if psinkcount == 5:
+    turmove(writer,-125,50)
+    writer.color("green")
+    writer.write("YOU WIN!",font=("times new roman",40))
+    writer.color("red")
+  else:
+    turmove(writer,-135,50)
+    writer.write("YOU LOSE!",font=("times new roman",40))
+  time.sleep(2)
+  boardmake.width(50)
+  boardmake.color("grey")
+  turmove(boardmake,-160,-100)
+  turmake(boardmake,90,320)
+  turmove(boardmake,-50,-110)
+  boardmake.color("black")
+  boardmake.write("Menu",font=("times new roman",30))
+  choice=input()
+  clearscreen()
+  if choice=="Menu":
+    homescreen()
+def modes():
+  boardmake.width(50)
+  time.sleep(1)
+  turmove(writer,-200,160)
+  writer.write("Modes",font=("times new roman",40))
+  time.sleep(0.7)
+  boardmake.color("grey")
+  turmove(boardmake,-160,0)
+  turmake(boardmake,0,320)
+  turmove(boardmake,-135,-10)
+  boardmake.color("black")
+  boardmake.write("Player VS Robot",font=("times new roman",30))
+  time.sleep(0.5)
+  boardmake.color("grey")
+  turmove(boardmake,-160,-50)
+  turmake(boardmake,0,320)
+  turmove(boardmake,-135,-60)
+  boardmake.color("black")
+  boardmake.write("Player VS Player",font=("times new roman",30))
+  time.sleep(0.5)
+  boardmake.color("grey")
+  turmove(boardmake,-160,-100)
+  turmake(boardmake,0,320)
+  turmove(boardmake,-50,-110)
+  boardmake.color("black")
+  boardmake.write("Menu",font=("times new roman",30))
+  choice=input()
+  clearscreen()
+  if choice=="Player VS Robot":
+    playrobot()
+  elif choice=="Player VS Player":
+    pass
+  elif choice=="Menu":
+    homescreen()
+def howtoplay():
+  time.sleep(1)
+  turmove(writer,-200,160)
+  writer.write("How to play",font=("times new roman",40))
+  time.sleep(0.7)
+  turmove(writer,-180,100)
+  writer.write("Your aim is to attack and sink all",font=("times new roman",20))
+  turmove(writer,-180,75)
+  writer.write("of your enemy's ships without",font=("times new roman",20))
+  turmove(writer,-180,50)
+  writer.write("your own ships being sunk.",font=("times new roman",20))
+  turmove(writer,-180,10)
+  writer.write("You can do this by entering a",font=("times new roman",20))
+  turmove(writer,-180,-15)
+  writer.write("row as a number and a collum as",font=("times new roman",20))
+  turmove(writer,-180,-40)
+  writer.write("a letter",font=("times new roman",20))
+  time.sleep(0.7)
+  boardmake.color("grey")
+  turmove(boardmake,-160,-100)
+  turmake(boardmake,0,320)
+  turmove(boardmake,-50,-110)
+  boardmake.color("black")
+  boardmake.write("Menu",font=("times new roman",30))
+  choice=input()
+  clearscreen()
+  if choice=="Menu":
+    homescreen()
+def homescreen():
+  boardmake.width(50)
+  time.sleep(1)
+  turmove(writer,-160,100)
+  writer.write("Battle Ships",font=("times new roman",50))
+  time.sleep(0.7)
+  boardmake.color("grey")
+  turmove(boardmake,-160,0)
+  turmake(boardmake,0,320)
+  turmove(boardmake,-40,-10)
+  boardmake.color("black")
+  boardmake.write("Play",font=("times new roman",30))
+  time.sleep(0.5)
+  boardmake.color("grey")
+  turmove(boardmake,-160,-50)
+  turmake(boardmake,0,320)
+  turmove(boardmake,-100,-60)
+  boardmake.color("black")
+  boardmake.write("How to play",font=("times new roman",30))
+  time.sleep(0.5)
+  boardmake.color("grey")
+  turmove(boardmake,-160,-100)
+  turmake(boardmake,0,320)
+  turmove(boardmake,-35,-110)
+  boardmake.color("black")
+  boardmake.write("Exit",font=("times new roman",30))
+  choice=input()
+  clearscreen()
+  if choice == "Play":
+    playrobot()
+  elif choice == "How to play":
+    howtoplay()
+  elif choice == "Modes":
+    modes()
+homescreen()
