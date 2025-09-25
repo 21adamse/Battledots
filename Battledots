@@ -229,7 +229,6 @@ def enemyships():
           shipon=True
           for i in range(ship):
             turmove(boardmake,x,y)
-            boardmake.dot(10,"green")
             enemydots[s][d].append(x)
             enemydots[s][d].append(y)
             y+=17
@@ -244,7 +243,6 @@ def enemyships():
           shipon=True
           for i in range(ship):
             turmove(boardmake,x,y)
-            boardmake.dot(10,"green")
             enemydots[s][d].append(x)
             enemydots[s][d].append(y)
             x+=17
